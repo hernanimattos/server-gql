@@ -17,8 +17,13 @@ const typeDefs = gql`
   }
 `;
 const cepResponse = async (cep) => {
-  const { cep: cepValue } = cep;
-  const { data = {} } = await HTTP.get(`${cepValue}/json`);
+  const {
+    cep: cepValue,
+  } = cep;
+  const {
+    data = {},
+  } = await HTTP.get(`${cepValue}/json`);
+
   return data;
 };
 
@@ -30,9 +35,23 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer(
+  {
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      const {
+        headers: {
+          authorization,
+        },
+      } = req;
+
+      return authorization;
+    },
+  },
+);
 
 // The `listen` method launches a web server.
 server.listen().then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`); // eslint-disable-line
+  console.warn(`🚀  Server ready at ${url}`); // eslint-disable-line
 });
